@@ -84,7 +84,16 @@ if ($env['ext'] != 'admin')
 				$customnewscats = cot_structure_children($bbcat);
 				$bbcatwhere = (count($customnewscats)) ? " AND page_cat IN ('".implode("', '", $customnewscats)."')" : '';
 			}
-			$bbsql = $db->query("SELECT * FROM $db_pages 
+			
+			/* === Hook === */
+			foreach (cot_getextplugins('customnews.query') as $pl)
+			{
+				include $pl;
+			}
+			/* ===== */
+			
+			$bbsql = $db->query("SELECT p.* $cns_join_columns
+			FROM $db_pages AS p $cns_join_tables
 			WHERE page_state='0' $bbcatwhere {$tabinfo['where']} 
 			ORDER BY {$tabinfo['order']} LIMIT {$tabinfo['count']}");
 
